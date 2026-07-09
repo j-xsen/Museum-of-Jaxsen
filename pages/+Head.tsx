@@ -57,6 +57,9 @@ export function Head() {
 
       {/* Umami Analytics */}
       <script defer src="https://umami-psi-inky.vercel.app/script.js" data-website-id="57dfafa4-9794-4eef-b0c2-9cde909e712c"></script>
+
+      {/* JWS Analytics */}
+      <script async src="https://web.jxsen.com/api/tracker.js" data-website-id="b103b50e-3844-4d17-ba2e-9cecead8a6b3"></script>
     </>
   );
 }
