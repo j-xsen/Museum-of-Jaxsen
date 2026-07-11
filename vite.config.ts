@@ -8,9 +8,14 @@ export default defineConfig({
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes("node_modules/three") || id.includes("node_modules/@react-three")) {
-            return "three";
+        // Split the 3D-scene vendor code out of the main bundle so it caches
+        // independently and unrelated changes don't bust the whole chunk.
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("node_modules/@react-three/drei")) return "vendor-drei";
+          if (id.includes("node_modules/@react-three/uikit")) return "vendor-uikit";
+          if (id.includes("node_modules/@react-three/fiber") || id.includes("node_modules/three/")) {
+            return "vendor-three";
           }
         },
       },

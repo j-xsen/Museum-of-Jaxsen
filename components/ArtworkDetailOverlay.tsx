@@ -112,11 +112,7 @@ export default function ArtworkDetailOverlay() {
         <button
           type="button"
           data-gallery-action="order"
-          aria-label={
-            artwork.available
-              ? `Order a print of ${artwork.title} for $${artwork.price}`
-              : `${artwork.title} is not available for purchase`
-          }
+          aria-label={artwork.available ? undefined : `${artwork.title} — Not Available`}
           aria-disabled={!artwork.available}
           onClick={artwork.available ? () => createCheckoutSession(artwork) : undefined}
           style={{
@@ -138,7 +134,7 @@ export default function ArtworkDetailOverlay() {
 
         <button
           type="button"
-          aria-label={`View ${artwork.title} full size`}
+          aria-label={`View Large — ${artwork.title} full size`}
           onClick={() => { track("view_large", { title: artwork.title }); setIsBackWallView(true); }}
           style={{
             ...BTN_BASE,

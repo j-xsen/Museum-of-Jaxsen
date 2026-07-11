@@ -5,6 +5,7 @@ import Floor from "./Floor";
 import Wall from "./Wall";
 import Artwork from "./Artwork";
 import ArtworkLabel from "./ArtworkLabel";
+import ArtworkPlaceholder from "./ArtworkPlaceholder";
 import CameraAnimator from "./CameraAnimator";
 import BackRoom from "./BackRoom";
 import LogoDecal from "./LogoDecal";
@@ -18,11 +19,31 @@ export type PlaneProps = {
   position: [number, number, number];
 };
 
+// ±2 around the active index — fov=80/spacing=3 only shows ~3 artworks in
+// frame at once, so this covers what's visible plus one scroll-step of lead time.
+const WINDOW_RADIUS = 2;
+
+// Grows only — once an artwork's texture has been requested it stays mounted,
+// so scrolling back never re-suspends or flickers (mirrors LazyBackRoom below).
+function useArtworkWindow(artworks: Data["artworks"], radius: number) {
+  const activeArtworkId = useMuseumStore((s) => s.activeArtworkId);
+  const visited = useRef<Set<number>>(new Set());
+
+  const activeIndex = Math.max(0, artworks.findIndex((a) => a.id === activeArtworkId));
+  for (let i = activeIndex - radius; i <= activeIndex + radius; i++) {
+    if (i >= 0 && i < artworks.length) visited.current.add(i);
+  }
+  return visited.current;
+}
+
 function Structure() {
   const data = useData<Data | { artwork?: any }>();
 
   const artworks = "artworks" in data ? data.artworks : [];
   const isGalleryPage = artworks.length > 0;
+
+  // Must run every render (before the early return below) to satisfy Rules of Hooks.
+  const windowIndices = useArtworkWindow(artworks, WINDOW_RADIUS);
 
   if (!isGalleryPage) {
     return (
@@ -71,16 +92,25 @@ function Structure() {
       <LazyBackRoom artworks={artworks} wallWidth={wallWidth} />
 
       <GalleryController artworks={artworks} spacing={spacing}>
-        {artworks.map((artwork, index) => (
-          <group key={artwork.id}>
-            <Artwork
-              artwork={artwork}
-              position={[index * spacing, 1.5, 0.1]}
-              index={index}
-            />
-            <ArtworkLabel title={artwork.title} artworkId={artwork.id} x={index * spacing} />
-          </group>
-        ))}
+        {artworks.map((artwork, index) => {
+          const position: [number, number, number] = [index * spacing, 1.5, 0.1];
+          const aspectRatio = artwork.dimensions.height / artwork.dimensions.width;
+          const height = 2;
+          const width = height * aspectRatio;
+
+          return (
+            <group key={artwork.id}>
+              {windowIndices.has(index) ? (
+                <Suspense fallback={<ArtworkPlaceholder position={position} width={width} height={height} />}>
+                  <Artwork artwork={artwork} position={position} index={index} />
+                </Suspense>
+              ) : (
+                <ArtworkPlaceholder position={position} width={width} height={height} />
+              )}
+              <ArtworkLabel title={artwork.title} artworkId={artwork.id} x={index * spacing} />
+            </group>
+          );
+        })}
       </GalleryController>
     </group>
   );
