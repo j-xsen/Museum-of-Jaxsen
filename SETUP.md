@@ -56,6 +56,13 @@ CONTENTFUL_ACCESS_TOKEN=your_delivery_api_token
 # Stripe
 STRIPE_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SHIPPING_RATE_US=shr_your_us_rate_id_here
+STRIPE_SHIPPING_RATE_INTL=shr_your_intl_rate_id_here
+
+# Resend (transactional email)
+RESEND_API_KEY=re_your_api_key_here
+RESEND_FROM_EMAIL=hello@yourdomain.com
+
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 

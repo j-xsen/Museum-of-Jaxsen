@@ -1,53 +1,44 @@
-Generated with [vike.dev/new](https://vike.dev/new) ([version 598](https://www.npmjs.com/package/create-vike/v/0.0.598)) using this command:
+# Museum of Jaxsen
 
-```sh
-pnpm create vike@latest --react --vercel
+3D art gallery with print e-commerce. Artworks render as planes in a persistent Three.js/WebGL scene; page routing changes what's visible in the scene rather than replacing DOM content.
+
+## Stack
+
+- [Vike](https://vike.dev) (Vite meta-framework) — filesystem-based routing, prerendering
+- [React](https://react.dev) + [react-three-fiber](https://r3f.docs.pmnd.rs) / [drei](https://github.com/pmndrs/drei) for the 3D scene
+- [Zustand](https://github.com/pmndrs/zustand) for gallery interaction state
+- [Contentful](https://www.contentful.com) for artwork content
+- [Stripe](https://stripe.com) Checkout for print purchases
+- [Resend](https://resend.com) for order emails
+- Deployed on [Vercel](https://vercel.com) (via [Photon](https://photonjs.dev))
+
+## Setup
+
+```bash
+cp .env.example .env
 ```
 
-## Contents
+Fill in Contentful, Stripe, and Resend credentials — see `.env.example`. For the Contentful content type schema, see `CONTENTFUL_SETUP.md`.
 
-- [Vike](#vike)
-  - [Plus files](#plus-files)
-  - [Routing](#routing)
-  - [SSR](#ssr)
-  - [HTML Streaming](#html-streaming)
-- [Photon](#photon)
+## Commands
 
-## Vike
+```bash
+pnpm dev        # Vike dev server + Express API server (ports 3000 + 3001)
+pnpm build      # Build with Vike
+pnpm preview    # Build then preview production locally
+```
 
-This app is ready to start. It's powered by [Vike](https://vike.dev) and [React](https://react.dev/learn).
+No test or lint scripts are configured.
 
-### Plus files
+## Structure
 
-[The + files are the interface](https://vike.dev/config) between Vike and your code.
+- `pages/` — Vike routes (`+Page.tsx`, `+data.ts`, `+Layout.tsx`, `+config.ts`, `+Head.tsx` per route)
+  - `index/` — gallery front room
+  - `artwork/@slug/` — artwork detail view
+  - `purchase/` — Stripe checkout success/cancel
+  - `admin/` — admin views
+- `components/` — the 3D scene (`Structure.tsx` is the root scene, `Artwork.tsx` renders each piece, `Wall.tsx`/`Floor.tsx`/`BackRoom.tsx` build the space, `CameraAnimator.tsx` handles view transitions)
+- `lib/` — `contentful.ts` (data fetching/transform), `store.ts` (Zustand gallery state), `stripe.ts` (checkout), `analytics.ts` (Umami wrapper), `artworks.ts`
+- `api/` — Vercel serverless functions (`create-checkout.ts`, `ship-order.ts`, `sitemap.ts`), wrapped locally by `server.js` for dev
 
-- [`+config.ts`](https://vike.dev/settings) — Settings (e.g. `<title>`)
-- [`+Page.tsx`](https://vike.dev/Page) — The `<Page>` component
-- [`+data.ts`](https://vike.dev/data) — Fetching data (for your `<Page>` component)
-- [`+Layout.tsx`](https://vike.dev/Layout) — The `<Layout>` component (wraps your `<Page>` components)
-- [`+Head.tsx`](https://vike.dev/Head) - Sets `<head>` tags
-- [`/pages/_error/+Page.tsx`](https://vike.dev/error-page) — The error page (rendered when an error occurs)
-- [`+onPageTransitionStart.ts`](https://vike.dev/onPageTransitionStart) and `+onPageTransitionEnd.ts` — For page transition animations
-
-### Routing
-
-[Vike's built-in router](https://vike.dev/routing) lets you choose between:
-
-- [Filesystem Routing](https://vike.dev/filesystem-routing) (the URL of a page is determined based on where its `+Page.jsx` file is located on the filesystem)
-- [Route Strings](https://vike.dev/route-string)
-- [Route Functions](https://vike.dev/route-function)
-
-### SSR
-
-SSR is enabled by default. You can [disable it](https://vike.dev/ssr) for all or specific pages.
-
-### HTML Streaming
-
-You can [enable/disable HTML streaming](https://vike.dev/stream) for all or specific pages.
-
-## Photon
-
-[Photon](https://photonjs.dev) is a next-generation infrastructure for deploying JavaScript servers.
-
-See [Introducing Photon](https://vike.dev/blog/photon) and [Why Photon](https://photonjs.dev/why) to learn more.
-
+See `CLAUDE.md` for a fuller architecture writeup and data flow.
