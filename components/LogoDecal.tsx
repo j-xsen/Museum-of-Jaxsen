@@ -1,7 +1,7 @@
 import { useKTX2 } from "@react-three/drei";
 
 export default function LogoDecal() {
-  const texture = useKTX2("/textures/logo.ktx2");
+  const texture = useKTX2("/textures/logo.ktx2", "/basis/");
 
   return (
     <mesh position={[0, 4, 0.01]}>
