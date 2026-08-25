@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { Plane, useKTX2 } from "@react-three/drei";
+import { Plane, useTexture } from "@react-three/drei";
 import { RepeatWrapping } from "three";
 import type { PlaneProps } from "./Structure";
 
 export default function Wall(props: PlaneProps) {
-  const texture = useKTX2("/textures/wall.ktx2", "/basis/");
+  const texture = useTexture("/textures/wall.webp");
 
   useMemo(() => {
     texture.wrapS = texture.wrapT = RepeatWrapping;

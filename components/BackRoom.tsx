@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
-import { Plane, useTexture, useKTX2 } from "@react-three/drei";
+import { Plane, useTexture } from "@react-three/drei";
 import { DoubleSide, RepeatWrapping, SpotLight } from "three";
 import { useMuseumStore } from "../lib/store";
 import type { Data } from "../pages/index/+data";
@@ -78,8 +78,8 @@ function BackWallSpot({ artworkY }: { artworkY: number }) {
 }
 
 function BackWallSurfaces({ wallWidth }: { wallWidth: number }) {
-  const wallTex = useKTX2("/textures/wall.ktx2", "/basis/");
-  const floorTex = useKTX2("/textures/floor.ktx2", "/basis/");
+  const wallTex = useTexture("/textures/wall.webp");
+  const floorTex = useTexture("/textures/floor.webp");
 
   const tiledWall = useMemo(() => {
     const t = wallTex.clone();
